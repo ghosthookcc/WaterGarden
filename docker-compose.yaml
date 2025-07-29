@@ -25,7 +25,6 @@ services:
     depends_on:
       influxdb3-core:
         condition: service_healthy
-    # Optionally, you can switch to depend on influxdb3-enterprise if using that
     environment:
       - INFLUXDB_HOST=${INFLUXDB_HOST}
       - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
@@ -48,7 +47,6 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
     depends_on:
       - influxdb3-core
-    # Or switch to influxdb3-enterprise as needed
     restart: unless-stopped
 
 volumes:
