@@ -5,7 +5,10 @@ const int flowPin = 2;
 const int maxWetValue = 195;
 const int minWetValue = 475; 
 
-const int shouldWaterForTimeInMS = 3000;
+const unsigned long maxShouldWaterForTimeInMS = 5000.0;
+const unsigned long waitTimeBetweenWatering = 86400000.0;
+
+const double amountToWaterInLiters = 0.4;
 
 unsigned long lastRunTimeInMS = 0;
 unsigned long currentRunTimeInMS = 0;
@@ -13,12 +16,14 @@ unsigned long currentRunTimeInMS = 0;
 bool isWatering = false;
 
 int wateringStartTime = 0;
+int wateringMaxEndTime = 0;
 int currentWateringTime = 0;
+
+float flowPulseCalibrationFactor = 9800.0; // Pulses per liter for YF-S401
 
 volatile unsigned long pulseCounter;
 
-float flowPulseCalibrationFactor = 100000.0; // Pulses per liter for YF-S401
-volatile float totalLitersDrained = 0.0;
+volatile double totalLitersDrained = 0.0;
 
 void countPulse() { pulseCounter++; }
 
@@ -47,9 +52,10 @@ void loop()
     Serial.print(humidityPercentage);
     Serial.print("%\n");
 
-    if (humidityPercentage < 25 and !isWatering)
+    if (!isWatering and humidityPercentage < 25)
     {
         wateringStartTime = millis();
+        wateringMaxEndTime = wateringStartTime + maxShouldWaterForTimeInMS;
         isWatering = true;
 
         digitalWrite(relaySwitchPin, HIGH);
@@ -61,7 +67,7 @@ void loop()
         currentWateringTime = millis();
         Serial.print("CURRENTLY WATERING\n");
 
-        if (currentRunTimeInMS - lastRunTimeInMS >= 250)
+        if (currentRunTimeInMS - lastRunTimeInMS >= 1000)
         {
             detachInterrupt(digitalPinToInterrupt(flowPin));
 
@@ -80,10 +86,13 @@ void loop()
             attachInterrupt(digitalPinToInterrupt(flowPin), countPulse, FALLING);
         }
 
-        if ((currentWateringTime - wateringStartTime) >= shouldWaterForTimeInMS)
+        if (totalLitersDrained >= amountToWaterInLiters or ((currentWateringTime - wateringStartTime) >= wateringMaxEndTime))
         {
             digitalWrite(relaySwitchPin, LOW);
+
             currentWateringTime = 0;
+            wateringMaxEndTime = 0;
+
             isWatering = false;
             Serial.print("STOPPED WATERING\n");
 
@@ -92,7 +101,7 @@ void loop()
             Serial.println(" L");
 
             totalLitersDrained = 0;
-            delay(5000);
+            delay(waitTimeBetweenWatering);
         }
     }
     delay(500);
