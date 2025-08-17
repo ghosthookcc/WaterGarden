@@ -5,10 +5,10 @@ const int flowPin = 2;
 const int maxWetValue = 195;
 const int minWetValue = 475; 
 
-const unsigned long maxShouldWaterForTimeInMS = 5000.0;
-const unsigned long waitTimeBetweenWatering = 86400000.0;
+const unsigned long maxShouldWaterForTimeInMS = 8000.0;
+const unsigned long waitTimeBetweenWateringInMS = 86400000.0;
 
-const double amountToWaterInLiters = 0.4;
+const double amountToWaterInLiters = 2.0;
 
 unsigned long lastRunTimeInMS = 0;
 unsigned long currentRunTimeInMS = 0;
