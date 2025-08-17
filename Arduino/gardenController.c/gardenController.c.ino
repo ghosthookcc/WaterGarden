@@ -6,7 +6,7 @@ const int maxWetValue = 195;
 const int minWetValue = 475; 
 
 const unsigned long maxShouldWaterForTimeInMS = 8000.0;
-const unsigned long waitTimeBetweenWateringInMS = 86400000.0;
+const unsigned long waitTimeBetweenWateringInMS = 43200000.0;
 
 const double amountToWaterInLiters = 2.0;
 
@@ -101,7 +101,7 @@ void loop()
             Serial.println(" L");
 
             totalLitersDrained = 0;
-            delay(waitTimeBetweenWatering);
+            delay(waitTimeBetweenWateringInMS);
         }
     }
     delay(500);
